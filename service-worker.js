@@ -1,5 +1,5 @@
 // Definisce un nome e una versione per la cache
-const CACHE_NAME = 'simulatore-193-cache-v1';
+const CACHE_NAME = 'simulatore-193-cache-v2';
 
 // Elenco dei file da memorizzare nella cache per il funzionamento offline
 // In questo caso, la pagina principale e le risorse esterne
@@ -39,3 +39,4 @@ self.addEventListener('fetch', event => {
     )
   );
 });
+
