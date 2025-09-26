@@ -150,7 +150,6 @@
         .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
         input[type="text"], input[type="datetime-local"] { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; }
         
-        /* Stile per il box "Powered By" */
         .powered-by-box {
             position: fixed;
             top: 10px;
@@ -164,28 +163,73 @@
             font-weight: 500;
         }
         .powered-by-text {
-            font-size: 10px; /* Carattere piccolo come richiesto */
+            font-size: 10px;
             animation: color-cycle 8s infinite linear, pulse 2s infinite ease-in-out;
         }
 
         @keyframes color-cycle {
-            0%   { color: #3b82f6; } /* Blu */
-            25%  { color: #8b5cf6; } /* Viola */
-            50%  { color: #ec4899; } /* Rosa */
-            75%  { color: #f97316; } /* Arancione */
-            100% { color: #3b82f6; } /* Ritorno al Blu */
+            0%   { color: #3b82f6; } 25%  { color: #8b5cf6; } 50%  { color: #ec4899; } 75%  { color: #f97316; } 100% { color: #3b82f6; }
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
+        }
+
+        /* OTTIMIZZAZIONI PER SCHERMI PICCOLI (MOBILE) */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.5rem; /* Riduco il padding generale */
+            }
+            .card {
+                padding: 1.5rem; /* Riduco il padding della card principale */
+                border-radius: 1rem;
+            }
+            .header {
+                flex-direction: column; /* Impilo logo e titolo in verticale */
+                align-items: flex-start;
+                text-align: left;
+                margin-bottom: 1.5rem;
+            }
+            .header-logo {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            .header-logo svg {
+                width: 50px;
+                height: 50px;
+            }
+            .header-title h1 {
+                font-size: 1.6rem; /* Riduco la dimensione del titolo principale */
+            }
+            .header-title p {
+                font-size: 0.9rem; /* Riduco la dimensione del sottotitolo */
+            }
+            .step-title {
+                font-size: 1.25rem; /* Riduco la dimensione dei titoli dei passi */
+            }
+            .choice-button, .radio-label {
+                padding: 0.75rem 1rem; /* Riduco il padding interno dei pulsanti */
+            }
+            .choice-button strong, .radio-label strong {
+                font-size: 1rem; /* Riduco la dimensione del testo principale nei pulsanti */
+            }
+            .choice-button p, .radio-label p {
+                font-size: 0.85rem; /* Riduco la dimensione del testo secondario nei pulsanti */
+            }
+            .result-box {
+                padding: 1.5rem; /* Riduco il padding del box dei risultati */
+            }
+            .result-box h3 {
+                font-size: 1.25rem; /* Riduco la dimensione del titolo nei risultati */
+            }
+            .modal-content {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Box "Powered By" aggiunto qui -->
     <div class="powered-by-box">
         <span class="powered-by-text">Powered By Michele Rosati</span>
     </div>
@@ -237,14 +281,14 @@
                 <div class="space-y-6">
                     <div>
                         <label class="font-semibold text-gray-800">Tipo Veicolo</label>
-                        <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="tipoVeicoloAuto" name="tipoVeicolo" value="autoveicolo" checked><label for="tipoVeicoloAuto" class="radio-label"><strong>Autoveicolo</strong></p></label></div>
                             <div><input type="radio" id="tipoVeicoloMoto" name="tipoVeicolo" value="motociclo"><label for="tipoVeicoloMoto" class="radio-label"><strong>Motociclo/Ciclomotore</strong></p></label></div>
                         </div>
                     </div>
                     <div>
                         <label class="font-semibold text-gray-800">Conducente / Veicolo</label>
-                        <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="nazionalitaIT" name="nazionalita" value="italiano" checked><label for="nazionalitaIT" class="radio-label"><strong>Italiano/Comunitario</strong><p>Patente e veicolo italiani/UE</p></label></div>
                             <div><input type="radio" id="nazionalitaExtra" name="nazionalita" value="straniero"><label for="nazionalitaExtra" class="radio-label"><strong>Straniero Extra-UE</strong><p>Patente o veicolo non UE</p></label></div>
                         </div>
@@ -252,14 +296,14 @@
                     </div>
                     <div>
                         <label class="font-semibold text-gray-800">Ha causato un sinistro stradale?<span class="info-icon" onclick="showInfoModal('sinistro')">i</span></label>
-                         <div class="grid grid-cols-2 gap-4 mt-2">
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="sinistroNo" name="sinistro" value="no" checked><label for="sinistroNo" class="radio-label"><strong>No</strong></label></div>
                             <div><input type="radio" id="sinistroSi" name="sinistro" value="si"><label for="sinistroSi" class="radio-label"><strong>Sì</strong></label></div>
                         </div>
                     </div>
                     <div id="sinistro-details" class="hidden pl-4 mt-4 border-l-4 border-red-400">
                         <label class="font-semibold text-red-800">Conseguenze del Sinistro</label>
-                         <div class="grid grid-cols-2 gap-4 mt-2">
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="sinistroDanni" name="tipoSinistro" value="danni"><label for="sinistroDanni" class="radio-label"><strong>Solo danni a cose</strong></label></div>
                             <div><input type="radio" id="sinistroLesioni" name="tipoSinistro" value="lesioni"><label for="sinistroLesioni" class="radio-label"><strong>Lesioni a persone</strong></label></div>
                         </div>
@@ -677,4 +721,3 @@
     </script>
 </body>
 </html>
-
