@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Guidato Art. 193 CdS (Assicurazione)</title>
+    <!-- Link al manifest per la PWA -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Colore del tema per la PWA -->
+    <meta name="theme-color" content="#3b82f6">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        .card {
+            max-width: 800px;
+            width: 100%;
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .header-logo {
+            flex-shrink: 0;
+            margin-right: 1.5rem;
+        }
+        .header-logo svg {
+            width: 60px;
+            height: 60px;
+        }
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.2;
+        }
+        .header-title p {
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        .choice-button, .radio-label {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            padding: 1rem 1.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            background-color: #f9fafb;
+        }
+        .choice-button:hover, .radio-label:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .choice-button strong, .radio-label strong {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+        .choice-button p, .radio-label p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #4b5563;
+            line-height: 1.4;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"]:checked + .radio-label {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: #9ca3af;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .info-icon:hover { background-color: #3b82f6; }
+        .norma-icon {
+            background-color: #4b5563;
+            font-style: normal;
+        }
+        .norma-icon:hover {
+             background-color: #1d4ed8;
+        }
+        .checkbox-group { display: flex; align-items: center; margin-bottom: 0.5rem; cursor: pointer; user-select: none; }
+        .custom-checkbox { position: relative; display: inline-block; width: 1.25rem; height: 1.25rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.375rem; transition: all 0.2s; flex-shrink: 0; margin-right: 0.75rem; }
+        .custom-checkbox::after { content: ''; position: absolute; display: none; left: 0.4rem; top: 0.15rem; width: 0.3rem; height: 0.6rem; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        input[type="checkbox"] { opacity: 0; position: absolute; }
+        input[type="checkbox"]:checked + .custom-checkbox { background-color: #3b82f6; border-color: #3b82f6; }
+        input[type="checkbox"]:checked + .custom-checkbox::after { display: block; }
+        input[type="checkbox"]:focus + .custom-checkbox { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); }
+
+        .result-box { background-color: #f1f5f9; border-radius: 1rem; padding: 2.5rem; display: none; color: #1f2937; margin-top: 2rem; }
+        .result-box h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #1f2937; line-height: 1.4; }
+        .result-section h4 { font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 0.25rem; display: flex; align-items: center; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; animation: modalFadeIn 0.3s; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background-color: #ffffff; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; }
+        .modal-body { max-height: 70vh; overflow-y: auto; white-space: pre-wrap; font-family: 'Inter', sans-serif; background-color: #f9fafb; border: 1px solid #d1d5db; padding: 1rem; border-radius: 0.5rem; }
+        .close-button { color: #aaa; position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        input[type="text"], input[type="datetime-local"] { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; }
+        
+        /* Stile per il box "Powered By" */
+        .powered-by-box {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+            font-weight: 500;
+        }
+        .powered-by-text {
+            font-size: 10px; /* Carattere piccolo come richiesto */
+            animation: color-cycle 8s infinite linear, pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes color-cycle {
+            0%   { color: #3b82f6; } /* Blu */
+            25%  { color: #8b5cf6; } /* Viola */
+            50%  { color: #ec4899; } /* Rosa */
+            75%  { color: #f97316; } /* Arancione */
+            100% { color: #3b82f6; } /* Ritorno al Blu */
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Box "Powered By" aggiunto qui -->
+    <div class="powered-by-box">
+        <span class="powered-by-text">Powered By Michele Rosati</span>
+    </div>
+
+    <div class="card mx-auto">
+        <div class="header">
+            <div class="header-logo">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.25C6.072 2.25 2.25 6.072 2.25 12C2.25 17.928 6.072 21.75 12 21.75C17.928 21.75 21.75 17.928 21.75 12C21.75 6.072 17.928 2.25 12 2.25ZM1.5 12C1.5 5.649 6.649 0.75 12 0.75C17.351 0.75 22.5 5.649 22.5 12C22.5 18.351 17.351 23.25 12 23.25C6.649 23.25 1.5 18.351 1.5 12Z" fill="#3b82f6"/><path d="M12 6.75C12.4142 6.75 12.75 7.08579 12.75 7.5V12.13L15.2197 14.6003C15.5126 14.8932 15.5126 15.3681 15.2197 15.661C14.9268 15.9539 14.4519 15.9539 14.159 15.661L11.2803 12.7803C11.1295 12.6295 11.0442 12.4228 11.0442 12.2058V7.5C11.0442 7.08579 11.3799 6.75 11.7842 6.75H12Z" fill="#3b82f6"/></svg>
+            </div>
+            <div class="header-title">
+                <h1>Simulatore Guidato Art. 193 CdS</h1>
+                <p>Vademecum Operativo Mancata Copertura Assicurativa (2025)</p>
+            </div>
+        </div>
+
+        <details class="mb-6">
+            <summary class="cursor-pointer text-blue-600 font-semibold mb-2">Mostra/Nascondi Dati di Intestazione</summary>
+            <div class="p-4 bg-gray-50 rounded-lg border details-grid">
+                <div><label class="block text-sm font-medium text-gray-700">Data e Ora</label><input type="datetime-local" id="dataOra"></div>
+                <div><label class="block text-sm font-medium text-gray-700">Luogo</label><input type="text" id="luogo" placeholder="Es. Via Roma, km 12"></div>
+                <div><label class="block text-sm font-medium text-gray-700">Agenti Accertatori</label><input type="text" id="agenti" placeholder="Matr. 123, Matr. 456"></div>
+                <div><label class="block text-sm font-medium text-gray-700">Targa Veicolo</label><input type="text" id="targa" placeholder="AA123BB"></div>
+            </div>
+        </details>
+
+        <div id="wizard">
+            <!-- Step 1: Contesto -->
+            <div id="step-1" class="step">
+                <h2 class="step-title">Fase 1: Contesto dell'Accertamento</h2>
+                <div class="space-y-4">
+                    <button class="choice-button" onclick="handleStep(1, 'controllo_strada')"><strong>Controllo su Strada</strong><p>Hai fermato un veicolo con conducente.</p></button>
+                    <button class="choice-button" onclick="handleStep(1, 'veicolo_sosta')"><strong>Veicolo in Sosta</strong><p>Hai trovato un veicolo parcheggiato, senza conducente.</p></button>
+                    <button class="choice-button" onclick="handleStep(1, 'rilevamento_remoto')"><strong>Rilevamento Remoto</strong><p>Segnalazione da sistema automatico.</p></button>
+                </div>
+            </div>
+            
+            <!-- Step 1-bis: Luogo Sosta -->
+            <div id="step-1-bis" class="step hidden">
+                <h2 class="step-title">Fase 1.1: Luogo della Sosta</h2>
+                <div class="space-y-4">
+                    <button class="choice-button" onclick="handleStep('1-bis', 'sosta_pubblica')"><strong>Su strada pubblica o area aperta al pubblico</strong><p>Es. parcheggio comunale, piazzale supermercato.</p></button>
+                    <button class="choice-button" onclick="handleStep('1-bis', 'sosta_privata')"><strong class="text-green-600">Su area privata non aperta al pubblico</strong><p>Es. garage privato, cortile recintato.</p></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Dati Preliminari -->
+            <div id="step-2" class="step hidden">
+                <h2 class="step-title">Fase 2: Dati Preliminari</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="font-semibold text-gray-800">Tipo Veicolo</label>
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div><input type="radio" id="tipoVeicoloAuto" name="tipoVeicolo" value="autoveicolo" checked><label for="tipoVeicoloAuto" class="radio-label"><strong>Autoveicolo</strong></p></label></div>
+                            <div><input type="radio" id="tipoVeicoloMoto" name="tipoVeicolo" value="motociclo"><label for="tipoVeicoloMoto" class="radio-label"><strong>Motociclo/Ciclomotore</strong></p></label></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-800">Conducente / Veicolo</label>
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div><input type="radio" id="nazionalitaIT" name="nazionalita" value="italiano" checked><label for="nazionalitaIT" class="radio-label"><strong>Italiano/Comunitario</strong><p>Patente e veicolo italiani/UE</p></label></div>
+                            <div><input type="radio" id="nazionalitaExtra" name="nazionalita" value="straniero"><label for="nazionalitaExtra" class="radio-label"><strong>Straniero Extra-UE</strong><p>Patente o veicolo non UE</p></label></div>
+                        </div>
+                         <div class="mt-4"><label class="checkbox-group"><input type="checkbox" id="isMinorenne"><span class="custom-checkbox"></span><span>Il conducente è minorenne</span><span class="info-icon" onclick="showInfoModal('minorenne')">i</span></label></div>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-800">Ha causato un sinistro stradale?<span class="info-icon" onclick="showInfoModal('sinistro')">i</span></label>
+                         <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div><input type="radio" id="sinistroNo" name="sinistro" value="no" checked><label for="sinistroNo" class="radio-label"><strong>No</strong></label></div>
+                            <div><input type="radio" id="sinistroSi" name="sinistro" value="si"><label for="sinistroSi" class="radio-label"><strong>Sì</strong></label></div>
+                        </div>
+                    </div>
+                    <div id="sinistro-details" class="hidden pl-4 mt-4 border-l-4 border-red-400">
+                        <label class="font-semibold text-red-800">Conseguenze del Sinistro</label>
+                         <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div><input type="radio" id="sinistroDanni" name="tipoSinistro" value="danni"><label for="sinistroDanni" class="radio-label"><strong>Solo danni a cose</strong></label></div>
+                            <div><input type="radio" id="sinistroLesioni" name="tipoSinistro" value="lesioni"><label for="sinistroLesioni" class="radio-label"><strong>Lesioni a persone</strong></label></div>
+                        </div>
+                    </div>
+                </div>
+                 <button type="button" onclick="handleStep(2, 'dati_ok')" class="mt-8 w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-xl">Prosegui</button>
+            </div>
+
+            <!-- Step 3: Circolazione -->
+            <div id="step-3" class="step hidden">
+                <h2 class="step-title">Fase 3: Situazione del Veicolo</h2>
+                <div class="space-y-4">
+                    <button class="choice-button" onclick="handleStep(3, 'prosegue_controllo')"><strong>Circolazione Ordinaria</strong><p>Procedi con la verifica della documentazione.</p></button>
+                    <button class="choice-button" onclick="handleStep(3, 'circolazione_abusiva')"><strong class="text-red-600">Circolazione Abusiva</strong><p>Il veicolo risulta già sottoposto a sequestro/fermo.</p></button>
+                </div>
+            </div>
+
+            <!-- Step 4: Esibizione -->
+            <div id="step-4" class="step hidden">
+                <h2 class="step-title">Fase 4: Esibizione Documentazione</h2>
+                <div class="space-y-4">
+                    <button class="choice-button" onclick="handleStep(4, 'documenti_esibiti')"><strong>Esibisce i documenti</strong><p>Analizza la validità del certificato.</p></button>
+                    <button class="choice-button" onclick="handleStep(4, 'mancata_esibizione')"><strong class="text-orange-600">Mancata Esibizione</strong><p>Non esibisce i documenti, ma dichiara di averli.</p></button>
+                    <button class="choice-button" onclick="handleStep(4, 'scoperto')"><strong>Privo di copertura</strong><p>Ammette di non essere assicurato o B.D. negativa.</p></button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Validità -->
+            <div id="step-5" class="step hidden">
+                <h2 class="step-title">Fase 5: Validità Documenti</h2>
+                <div class="space-y-4">
+                     <button class="choice-button" onclick="handleStep(5, 'scoperto_scaduto')"><strong>Polizza Scaduta</strong><p>Scaduta da oltre 15 giorni.</p></button>
+                    <button class="choice-button" onclick="handleStep(5, 'documenti_falsi')"><strong class="text-red-600">Documenti Falsi</strong><p>Certificato palesemente falso o contraffatto.</p></button>
+                     <button class="choice-button" onclick="handleStep(5, 'veicolo_straniero_no_regola')"><strong>Veicolo Straniero non in regola</strong><p>Manca Carta Verde o copertura equivalente.</p></button>
+                    <button class="choice-button" onclick="handleStep(5, 'in_regola')"><strong class="text-green-600">Tutto in regola</strong><p>Nessuna violazione.</p></button>
+                </div>
+            </div>
+
+            <!-- Step 6: Circostanze Finali -->
+            <div id="step-6" class="step hidden">
+                <h2 class="step-title">Fase Finale: Circostanze Rilevanti</h2>
+                 <div class="p-4 border border-gray-300 bg-gray-50 rounded-lg space-y-4">
+                    <div>
+                        <label class="font-bold text-gray-800">Reiterazione della Violazione<span class="info-icon" onclick="showInfoModal('reiterazione')">i</span></label>
+                        <div class="mt-2"><label class="checkbox-group"><input type="checkbox" id="reiterazioneBiennio"><span class="custom-checkbox"></span><span>Stessa violazione nel biennio</span></label></div>
+                    </div>
+                     <div>
+                        <label class="font-bold text-gray-800">Proprietà del Veicolo<span class="info-icon" onclick="showInfoModal('proprietaTerzi')">i</span></label>
+                        <div class="mt-2"><label class="checkbox-group"><input type="checkbox" id="proprietaTerzi"><span class="custom-checkbox"></span><span>Appartiene a persona estranea</span></label></div>
+                    </div>
+                    <div>
+                        <label class="font-bold text-green-800">Opzioni di Regolarizzazione<span class="info-icon" onclick="showInfoModal('riduzioneSanzione')">i</span></label>
+                        <p class="text-sm text-gray-600 mb-2">Selezionare se il trasgressore si avvale di facoltà che riducono la sanzione a 1/4.</p>
+                        <div class="mt-2 space-y-2">
+                             <label class="checkbox-group"><input type="checkbox" id="pagaAssicura"><span class="custom-checkbox"></span><span>Paga verbale e riattiva assicurazione</span></label>
+                             <label class="checkbox-group"><input type="checkbox" id="demolisceVeicolo"><span class="custom-checkbox"></span><span>Paga verbale e demolisce/radia veicolo</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                     <button type="button" onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl">Genera Quadro Sanzionatorio</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-container"></div>
+        <button id="resetButton" onclick="location.reload()" class="hidden w-full mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl">Nuovo Accertamento</button>
+    </div>
+    
+    <!-- Modals -->
+    <div id="infoModal" class="modal"><div class="modal-content"><span class="close-button" onclick="this.parentElement.parentElement.style.display = 'none'">&times;</span><h4 class="text-xl font-bold mb-4" id="info-title"></h4><div id="info-body" class="modal-body"></div></div></div>
+    <div id="facSimileModal" class="modal"><div class="modal-content"><span class="close-button" onclick="this.parentElement.parentElement.style.display = 'none'">&times;</span><h4 class="text-xl font-bold mb-4">Fac-Simile: Testo per Verbale</h4><div id="facSimile-body" class="modal-body"></div></div></div>
+
+    <script>
+        // Registrazione del Service Worker per la PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+
+        const accertamentoState = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const sinistroRadios = document.querySelectorAll('input[name="sinistro"]');
+            sinistroRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const details = document.getElementById('sinistro-details');
+                    if (e.target.value === 'si') {
+                        details.classList.remove('hidden');
+                        if (!document.querySelector('input[name="tipoSinistro"]:checked')) {
+                            document.getElementById('sinistroDanni').checked = true;
+                        }
+                    } else {
+                        details.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        const infoArticles = {
+             circolazione: {title: 'Nozione di "Circolazione Stradale"', text: 'Secondo la giurisprudenza costante della Corte di Cassazione, il concetto di "circolazione" a cui si riferisce il Codice della Strada non include solo il movimento del veicolo (marcia), ma anche le sue fasi statiche, come la fermata e la sosta. Pertanto, un veicolo parcheggiato su una strada pubblica o su un\'area ad essa equiparata (es. parcheggio di un centro commerciale) è considerato "in circolazione" e deve essere coperto da assicurazione R.C.A.'},
+             minorenne: {title: 'Informazione: Conducente Minorenne (L. 689/81)', text: 'Se il conducente che ha commesso la violazione è un minore, non può essere ritenuto responsabile per il pagamento della sanzione pecuniaria. Ai sensi della Legge n. 689/81, la responsabilità ricade sulla persona tenuta alla sua sorveglianza (solitamente il genitore). Il verbale deve essere notificato al genitore/tutore, che è l\'obbligato principale al pagamento. Le sanzioni accessorie che incidono sull\'abilitazione alla guida (es. sospensione della patente AM) sono invece applicate direttamente al minore.'},
+            sinistro: {title: 'Informazione: Art. 193, c. 2-ter - Sinistro Stradale', text: 'Qualora il veicolo sprovvisto di copertura assicurativa sia coinvolto in un sinistro stradale, la sanzione amministrativa pecuniaria prevista dal comma 2 è raddoppiata. Inoltre, si applica la sanzione accessoria del fermo amministrativo del veicolo per quarantacinque giorni.'},
+            riduzioneSanzione: {title: 'Informazione: Art. 193, c. 3 - Riduzione della Sanzione', text: 'La sanzione pecuniaria è ridotta a un quarto se l\'assicurazione viene riattivata entro 30 giorni dalla scadenza, oppure se, entro 30 giorni dalla contestazione, si provvede alla demolizione e radiazione del veicolo.'},
+            reiterazione: {title: 'Informazione: Art. 193, c. 2-bis - Reiterazione nel Biennio', text: 'Se la violazione è commessa per la seconda volta in due anni, si applicano sanzioni più severe: la sanzione pecuniaria è raddoppiata, si aggiunge la sospensione della patente da uno a due mesi e il veicolo è sottoposto a fermo amministrativo per 45 giorni.'},
+            proprietaTerzi: {title: 'Informazione: Principio di Estraneità del Proprietario', text: 'Se il veicolo appartiene a una persona estranea alla violazione, non si applica la confisca amministrativa nei casi in cui sarebbe prevista. Il veicolo viene comunque sequestrato e affidato in custodia giudiziale al proprietario.'},
+            documentiFalsi: {title: 'Informazione: Art. 193, c. 4-bis - Documenti Falsi', text: 'La presentazione di documenti assicurativi falsi o contraffatti comporta il raddoppio della sanzione pecuniaria, la sospensione della patente per un anno e la confisca amministrativa del veicolo. Si configura anche il reato di uso di atto falso (Art. 489 c.p.).'},
+            sequestro: {title: 'Informazione: Art. 193, c. 4 - Sequestro Amministrativo', text: 'L\'organo accertatore dispone il sequestro del veicolo. La procedura prevede: 1) Ordinare la cessazione della circolazione. 2) Offrire al proprietario/conducente la custodia in un\'area privata non soggetta a pubblico passaggio. 3) Se non possibile, affidare il veicolo a una depositeria autorizzata, con rimozione tramite carroattrezzi. 4) Apporre sempre i sigilli di sequestro.'},
+            circolazioneAbusiva: {title: 'Informazione: Art. 213, c. 8 - Circolazione Abusiva', text: 'Chiunque circola con un veicolo sequestrato è punito con una sanzione da 2.046 a 8.186 euro, sospensione della patente da uno a tre mesi e confisca obbligatoria del veicolo.'},
+            art180: {title: 'Informazione: Art. 180, c. 8 - Mancata Esibizione', text: 'Se il conducente non può esibire il certificato ma dichiara di averlo, e non è possibile una verifica immediata, si contesta l\'Art. 180, c. 7 (sanzione da 42 a 173 euro) e si redige un verbale con l\'invito a presentare i documenti. Il veicolo può proseguire la marcia.'},
+            norma_193_2: {title: 'Riferimento Normativo: Art. 193, comma 2, CdS', text: '«Chiunque circola senza la copertura dell\'assicurazione è soggetto alla sanzione amministrativa del pagamento di una somma da euro 866 a euro 3.464.»'},
+            norma_193_2ter_sinistro: {title: 'Riferimento Normativo: Art. 193, comma 2-ter, CdS', text: '«Quando lo stesso soggetto è incorso, in un periodo di due anni, in una delle violazioni di cui al comma 2 per almeno due volte, all\'ultima infrazione consegue altresì la sanzione amministrativa accessoria del fermo amministrativo del veicolo per quarantacinque giorni...» (Nota: la prassi consolidata estende il raddoppio della sanzione anche al caso di sinistro).'},
+            norma_193_3_riduzione: {title: 'Riferimento Normativo: Art. 193, comma 3, CdS', text: '«La sanzione amministrativa pecuniaria di cui al comma 2 è ridotta ad un quarto quando [...] l\'interessato, entro trenta giorni dalla contestazione, provvede alla demolizione e alle formalità di radiazione del veicolo.»'},
+            norma_193_2bis_reiterazione: {title: 'Riferimento Normativo: Art. 193, comma 2-bis, CdS', text: '«La sanzione amministrativa pecuniaria di cui al comma 2 è raddoppiata quando il veicolo risulta essere sprovvisto di copertura assicurativa per almeno due volte nell\'arco di un biennio... In tale caso, il veicolo è sottoposto al fermo amministrativo per quarantacinque giorni... La sanzione accessoria della sospensione della patente da uno a due mesi è altresì disposta...»'},
+            norma_193_4_sequestro: {title: 'Riferimento Normativo: Art. 193, comma 4, CdS', text: '«L\'organo accertatore ordina che la circolazione sulla strada del veicolo sia fatta immediatamente cessare e che il veicolo stesso sia in ogni caso prelevato, trasportato e depositato in luogo non soggetto a pubblico passaggio...»'},
+            norma_193_4bis_falsi: {title: 'Riferimento Normativo: Art. 193, comma 4-bis, CdS', text: '«La sanzione amministrativa di cui al comma 2 è raddoppiata qualora sia esibito un certificato di assicurazione falso o contraffatto. Oltre alla sanzione pecuniaria, si applica la sanzione accessoria della sospensione della patente di guida per un anno. Si applica la confisca amministrativa del veicolo.»'},
+            norma_213_8_abusiva: {title: 'Riferimento Normativo: Art. 213, comma 8, CdS', text: '«Il soggetto che ha assunto la custodia il quale, durante il periodo in cui il veicolo è sottoposto al sequestro, circola abusivamente con il veicolo stesso [...] è punito con la sanzione amministrativa del pagamento di una somma da euro 2.046 a euro 8.186. Si applica la sanzione amministrativa accessoria della sospensione della patente di guida da uno a tre mesi, nonché la confisca amministrativa del veicolo.»'},
+            norma_180_7_esibizione: {title: 'Riferimento Normativo: Art. 180, comma 7, CdS', text: '«Chiunque viola le disposizioni del presente articolo è soggetto alla sanzione amministrativa del pagamento di una somma da euro 42 a euro 173.»'}
+        };
+        
+        function handleStep(currentStep, value) {
+            accertamentoState[`step${currentStep}`] = value;
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(s => s.classList.add('hidden'));
+
+            let nextStepId = '';
+
+            switch (currentStep) {
+                case 1:
+                    if (value === 'rilevamento_remoto') {
+                        accertamentoState.caso = 'rilevamento_remoto';
+                        nextStepId = 'step-6';
+                    } else if (value === 'veicolo_sosta') {
+                        nextStepId = 'step-1-bis';
+                    } else {
+                        nextStepId = 'step-2';
+                    }
+                    break;
+                case '1-bis':
+                    if (value === 'sosta_privata') {
+                        accertamentoState.caso = 'sosta_privata';
+                        calculate(); return;
+                    }
+                    accertamentoState.caso = 'sosta_pubblica';
+                    nextStepId = 'step-6';
+                    break;
+                case 2:
+                     accertamentoState.tipoVeicolo = document.querySelector('input[name="tipoVeicolo"]:checked').value;
+                     accertamentoState.nazionalita = document.querySelector('input[name="nazionalita"]:checked').value;
+                     accertamentoState.isMinorenne = document.getElementById('isMinorenne').checked;
+                     accertamentoState.sinistro = document.querySelector('input[name="sinistro"]:checked').value;
+                     if(accertamentoState.sinistro === 'si'){
+                        accertamentoState.tipoSinistro = document.querySelector('input[name="tipoSinistro"]:checked').value;
+                     }
+                    if (accertamentoState.step1 === 'controllo_strada') {
+                        nextStepId = 'step-3';
+                    } else {
+                        nextStepId = 'step-6';
+                    }
+                    break;
+                case 3:
+                    if (value === 'circolazione_abusiva') {
+                        accertamentoState.caso = 'circolazione_abusiva';
+                        calculate(); return;
+                    }
+                    nextStepId = 'step-4';
+                    break;
+                case 4:
+                    if (value === 'mancata_esibizione') {
+                        accertamentoState.caso = 'mancata_esibizione';
+                        calculate(); return;
+                    }
+                    nextStepId = (value === 'documenti_esibiti') ? 'step-5' : 'step-6';
+                    if (value === 'scoperto') accertamentoState.caso = 'scoperto';
+                    break;
+                case 5:
+                    if (value === 'in_regola') {
+                        showResult({ titolo: 'Nessuna Violazione Rilevata', narrative: 'Il veicolo è risultato regolarmente coperto da assicurazione. Buon lavoro.', noSanctions: true });
+                        return;
+                    }
+                    accertamentoState.caso = value;
+                    nextStepId = 'step-6';
+                    break;
+            }
+            if (nextStepId) document.getElementById(nextStepId).classList.remove('hidden');
+        }
+        
+        function calculate() {
+            const caso = accertamentoState.caso;
+            let multaMin = 866, multaMax = 3464;
+            let sospensionePatenteMin = 0, sospensionePatenteMax = 0;
+            let gestioneVeicolo = { 
+                misura: 'Sequestro amministrativo', 
+                procedura: `1. Ordinare la cessazione della circolazione.\n2. Affidare in custodia al proprietario/conducente SE dispone di luogo idoneo, altrimenti affidare a depositeria autorizzata (con carroattrezzi).\n3. Apporre i sigilli di sequestro.`,
+                infoKey: 'sequestro', normaKey: 'norma_193_4_sequestro'
+            };
+            let atti = ['Verbale di contestazione', 'Verbale di sequestro e affidamento in custodia', 'Apposizione sigilli'];
+            let adempimenti = ['Trasmissione copia verbali alla Prefettura U.T.G.'];
+            let titolo = `Violazione Art. 193, c. 2 CdS - Mancata Copertura Assicurativa`;
+            let proceduralNarrative = ``, sanzioneRidotta = false, sanzioneNormaKey = 'norma_193_2';
+
+            if (accertamentoState.isMinorenne) {
+                proceduralNarrative += `La violazione è stata commessa da conducente minorenne. La sanzione pecuniaria viene notificata all'esercente la potestà genitoriale. Le sanzioni accessorie sulla patente si applicano al minore.\n`;
+                atti.push("Notifica del verbale all'esercente la potestà genitoriale");
+            }
+
+            switch(caso) {
+                case 'scoperto': case 'scoperto_scaduto': case 'veicolo_straniero_no_regola': case 'rilevamento_remoto': case 'sosta_pubblica':
+                    proceduralNarrative += caso === 'sosta_pubblica' ? 
+                        `Il veicolo è stato trovato in sosta su strada pubblica e, a seguito di accertamento, è risultato privo della copertura assicurativa.` :
+                        `È stata accertata la circolazione del veicolo privo della copertura assicurativa obbligatoria.`;
+
+                    const reiterazioneBiennio = document.getElementById('reiterazioneBiennio').checked;
+                    const proprietaTerzi = document.getElementById('proprietaTerzi').checked;
+                    const pagaAssicura = document.getElementById('pagaAssicura').checked;
+                    const demolisceVeicolo = document.getElementById('demolisceVeicolo').checked;
+                    
+                    if (accertamentoState.sinistro === 'si') {
+                        multaMin *= 2; multaMax *= 2;
+                        sanzioneNormaKey = 'norma_193_2ter_sinistro';
+                        proceduralNarrative += ` La violazione è commessa in occasione di un sinistro stradale con ${accertamentoState.tipoSinistro === 'danni' ? 'soli danni a cose' : 'lesioni a persone'}.`;
+                        gestioneVeicolo.misura = 'Fermo amministrativo per 45 giorni (oltre al sequestro)';
+                        gestioneVeicolo.procedura = 'Il fermo decorre dal pagamento e riattivazione polizza. Il veicolo resta sequestrato e affidato come da procedura standard fino a quel momento.';
+                        atti.push('Verbale di fermo amministrativo', 'Rilievo di sinistro stradale');
+                    }
+
+                    if (reiterazioneBiennio) {
+                        multaMin = 1732; multaMax = 6928;
+                        sospensionePatenteMin = 1; sospensionePatenteMax = 2;
+                        if(accertamentoState.sinistro !== 'si') {
+                           gestioneVeicolo.misura = 'Fermo amministrativo per 45 giorni (oltre al sequestro)';
+                           gestioneVeicolo.procedura = 'Il fermo decorre dal pagamento e riattivazione polizza. Il veicolo resta sequestrato fino a quel momento.';
+                           atti.push('Verbale di fermo amministrativo');
+                        }
+                        proceduralNarrative += ' Si contesta l\'aggravante della reiterazione nel biennio.';
+                        sanzioneNormaKey = 'norma_193_2bis_reiterazione';
+                    }
+                    if (pagaAssicura || demolisceVeicolo) {
+                        multaMin /= 4; multaMax /= 4; sanzioneRidotta = true;
+                        proceduralNarrative += ` Si dà atto della volontà di avvalersi della sanzione in misura ridotta.`;
+                    }
+                    if (proprietaTerzi) {
+                        gestioneVeicolo.procedura = `1. Ordinare la cessazione della circolazione.\n2. Affidare obbligatoriamente in custodia al legittimo proprietario.\n3. Apporre i sigilli di sequestro.`;
+                    }
+                    if(caso === 'rilevamento_remoto') {
+                         atti = ['Verbale di contestazione da notificare'];
+                         gestioneVeicolo = {misura: 'Nessuna (atto da notificare)', procedura: 'Il verbale verrà notificato al proprietario.', infoKey: 'sequestro', normaKey: 'norma_193_4_sequestro'};
+                         adempimenti = ['Notifica del verbale al proprietario del veicolo entro 90 giorni.'];
+                    }
+                    if(caso === 'sosta_pubblica') {
+                         gestioneVeicolo.misura = 'Sequestro amministrativo e rimozione coatta';
+                         gestioneVeicolo.procedura = `1. Essendo il proprietario assente, procedere con la rimozione forzata del veicolo.\n2. Affidare il veicolo a depositeria autorizzata.\n3. Redigere verbale di sequestro e apporre i sigilli.`;
+                         atti = ['Preavviso di accertamento', 'Verbale di sequestro e affidamento a depositeria', 'Apposizione sigilli'];
+                         adempimenti = ['Identificare il proprietario e notificare il verbale di contestazione.', 'Trasmettere copia verbali alla Prefettura U.T.G.'];
+                    }
+                    break;
+                case 'documenti_falsi':
+                    titolo = `Violazione Art. 193, c. 4-bis e Art. 489 c.p.`;
+                    proceduralNarrative += `È stata accertata la circolazione con documenti assicurativi falsi o contraffatti.`;
+                    multaMin *= 2; multaMax *= 2;
+                    sospensionePatenteMin = 12; sospensionePatenteMax = 12;
+                    gestioneVeicolo = { misura: 'Sequestro ai fini della Confisca Amministrativa', procedura: 'Affidamento obbligatorio a depositeria autorizzata con carroattrezzi.', infoKey: 'documentiFalsi', normaKey: 'norma_193_4bis_falsi'};
+                    atti = ['Verbale di contestazione (violazione aggravata)', 'Verbale di sequestro ai fini di confisca', 'Notizia di Reato per uso di atto falso'];
+                    adempimenti.push('Trasmissione Notizia di Reato alla Procura della Repubblica.');
+                    sanzioneNormaKey = 'norma_193_4bis_falsi';
+                    break;
+                case 'circolazione_abusiva':
+                    titolo = `Violazione Art. 213, c. 8 CdS - Circolazione Abusiva`;
+                    proceduralNarrative += `Il veicolo è stato sorpreso a circolare nonostante fosse già sottoposto a sequestro/fermo amministrativo.`;
+                    multaMin = 2046; multaMax = 8186;
+                    sospensionePatenteMin = 1; sospensionePatenteMax = 3;
+                    gestioneVeicolo = { misura: 'Confisca obbligatoria del veicolo', procedura: 'Rimozione con carroattrezzi e affidamento a depositeria per la successiva confisca.', infoKey: 'circolazioneAbusiva', normaKey: 'norma_213_8_abusiva' };
+                    atti = ['Verbale di contestazione Art. 213 c.8', 'Verbale di affidamento a depositeria per confisca'];
+                    adempimenti.push('In caso di recidiva, segnalare alla Prefettura per la revoca della patente.');
+                    sanzioneNormaKey = 'norma_213_8_abusiva';
+                    break;
+                case 'mancata_esibizione':
+                    titolo = `Violazione Art. 180, c. 7 e 8 CdS - Mancata Esibizione`;
+                    proceduralNarrative += `Il conducente non ha esibito la documentazione assicurativa, dichiarando di esserne in possesso.`;
+                    multaMin = 42; multaMax = 173;
+                    gestioneVeicolo = { misura: 'Nessuna misura sul veicolo', procedura: 'Il veicolo può riprendere la circolazione.', infoKey: 'art180' };
+                    atti = ['Verbale di contestazione Art. 180 c. 7', 'Invito a presentare documenti'];
+                    adempimenti = ['Attendere esibizione documenti. Se non valida, notificare verbale Art. 193.'];
+                    sanzioneNormaKey = 'norma_180_7_esibizione';
+                    break;
+                 case 'sosta_privata':
+                    showResult({ titolo: 'Nessuna Violazione Rilevata', narrative: 'Il veicolo in sosta su area privata non aperta al pubblico non è soggetto all\'obbligo di copertura assicurativa.', noSanctions: true });
+                    return;
+            }
+            showResult({titolo, proceduralNarrative, multaMin, multaMax, sospensionePatenteMin, sospensionePatenteMax, gestioneVeicolo, atti, adempimenti, sanzioneRidotta, sanzioneNormaKey});
+        }
+
+        function showResult(data) {
+            document.getElementById('wizard').classList.add('hidden');
+            document.getElementById('resetButton').classList.remove('hidden');
+            const resultContainer = document.getElementById('results-container');
+            
+            if (data.noSanctions) {
+                 resultContainer.innerHTML = `<div class="result-box" style="display: block;"><h3>${data.titolo}</h3><p>${data.narrative}</p></div>`;
+                 return;
+            }
+            
+            const resultBoxHTML = ` 
+                <div class="result-box" style="display: block;">
+                    <h3>${data.titolo}</h3>
+                    <div class="result-section"><h4>Riepilogo Procedurale</h4><p class="whitespace-pre-wrap">${data.proceduralNarrative}</p></div>
+                    <div class="result-section">
+                        <h4>Gestione Pratica del Veicolo <span class="info-icon norma-icon" onclick="showInfoModal('${data.gestioneVeicolo.normaKey}')">N</span></h4>
+                        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <strong>Misura da adottare:</strong> ${data.gestioneVeicolo.misura} <span class="info-icon" onclick="showInfoModal('${data.gestioneVeicolo.infoKey}')">i</span>
+                            <p class="text-sm mt-1 whitespace-pre-wrap"><strong>Procedura:</strong> ${data.gestioneVeicolo.procedura}</p>
+                        </div>
+                    </div>
+                    <div class="result-section mt-4"><h4>Quadro Sanzionatorio</h4><ul id="sanctionsList" class="space-y-4"></ul></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="result-section mt-4"><h4>Atti da Redigere</h4><ul id="actsList" class="space-y-2 list-disc list-inside"></ul></div>
+                        <div class="result-section mt-4"><h4>Adempimenti Successivi</h4><ul id="adempimentiList" class="space-y-2 list-disc list-inside"></ul></div>
+                    </div>
+                    <div class="mt-8 flex gap-4">
+                        <button onclick="showFacSimileModal()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl">Genera Fac-Simile Verbale</button>
+                    </div>
+                </div>`;
+            resultContainer.innerHTML = resultBoxHTML;
+
+            const sanctionsList = document.getElementById('sanctionsList');
+            const icons = {
+                money: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><line x1="12" x2="12" y1="2" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+                card: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>`
+            };
+            
+            let sanzioneNormaHTML = `<span class="info-icon norma-icon" onclick="showInfoModal('${data.sanzioneNormaKey}')">N</span>`;
+            if (data.sanzioneRidotta) sanzioneNormaHTML += `<span class="info-icon norma-icon" onclick="showInfoModal('norma_193_3_riduzione')">N</span>`;
+            
+            let sanzionePecuniariaText = accertamentoState.isMinorenne ? `<strong>(A carico del genitore/tutore)</strong> ` : '';
+            sanzionePecuniariaText += data.sanzioneRidotta ? 
+                `<strong class="text-green-700">(Importo ridotto a 1/4)</strong> Da €${Math.round(data.multaMin)} a €${Math.round(data.multaMax)}.` : 
+                `Da €${data.multaMin} a €${data.multaMax}.`;
+
+            sanctionsList.innerHTML += `<li class="flex items-start gap-4">${icons.money}<div><strong>Sanzione Pecuniaria: ${sanzioneNormaHTML}</strong><p>${sanzionePecuniariaText}</p></div></li>`;
+
+            if (data.sospensionePatenteMax > 0) {
+                let text = `da ${data.sospensionePatenteMin} a ${data.sospensionePatenteMax} mes${data.sospensionePatenteMax > 1 ? 'i' : 'e'}.`;
+                if(data.sospensionePatenteMax === 12) text = `per 1 anno.`
+                
+                let sanzioneAccessoriaTesto = accertamentoState.nazionalita === 'straniero' ? 'Inibizione alla guida in Italia' : 'Sospensione della patente';
+                if(accertamentoState.isMinorenne) sanzioneAccessoriaTesto += ' (a carico del minore)';
+
+                 let sospensioneNormaKey = data.sanzioneNormaKey === 'norma_213_8_abusiva' ? 'norma_213_8_abusiva' : 'norma_193_2bis_reiterazione';
+                 if (accertamentoState.caso === 'documenti_falsi') sospensioneNormaKey = 'norma_193_4bis_falsi';
+                 sanctionsList.innerHTML += `<li class="flex items-start gap-4">${icons.card}<div><strong>Sanzione Accessoria: <span class="info-icon norma-icon" onclick="showInfoModal('${sospensioneNormaKey}')">N</span></strong><p>${sanzioneAccessoriaTesto} ${text}</p></div></li>`;
+            }
+
+            document.getElementById('actsList').innerHTML = [...new Set(data.atti)].map(act => `<li>${act}</li>`).join('');
+            document.getElementById('adempimentiList').innerHTML = data.adempimenti.map(ad => `<li>${ad}</li>`).join('');
+        }
+        
+        function showInfoModal(key) {
+            const article = infoArticles[key];
+            if (article) {
+                document.getElementById('info-title').textContent = article.title;
+                document.getElementById('info-body').innerHTML = article.text;
+                document.getElementById('infoModal').style.display = 'flex';
+            }
+        }
+
+        function showFacSimileModal() {
+            const caso = accertamentoState.caso;
+            const dataOra = document.getElementById('dataOra').value ? new Date(document.getElementById('dataOra').value).toLocaleString('it-IT') : '[DATA E ORA]';
+            const luogo = document.getElementById('luogo').value || '[LUOGO]';
+            const agenti = document.getElementById('agenti').value || '[AGENTI OPERANTI]';
+            const targa = document.getElementById('targa').value || '[TARGA]';
+            
+            let testoVerbale = '';
+            let sinistroText = '';
+            if (accertamentoState.sinistro === 'si') {
+                 sinistroText = `Il suddetto veicolo risulta coinvolto in un sinistro stradale con ${accertamentoState.tipoSinistro === 'danni' ? 'soli danni a cose' : 'lesioni a persone'}, i cui rilievi sono stati eseguiti da personale di questo Ufficio. `;
+            }
+            
+            let conducenteText = 'condotto da [GENERALITÀ CONDUCENTE].';
+            if(accertamentoState.isMinorenne) {
+                conducenteText = `condotto dal minore [GENERALITÀ MINORE]. Poiché il trasgressore è persona minore degli anni diciotto, la violazione viene contestata a [GENERALITÀ GENITORE], in qualità di esercente la potestà genitoriale, il quale è tenuto al pagamento della sanzione in solido con il proprietario del veicolo.`;
+            }
+
+            switch(caso) {
+                case 'scoperto': case 'scoperto_scaduto': case 'veicolo_straniero_no_regola':
+                    testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} procedevano al controllo del veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText} ${sinistroText}All'esito degli accertamenti, si verificava che il veicolo circolava sprovvisto della copertura assicurativa R.C.A., in violazione dell'art. 193, c. 2, del D.Lgs. 285/92. Si procedeva alla contestazione e al sequestro amministrativo del veicolo, affidato in custodia a [CUSTODE].`;
+                    break;
+                case 'sosta_pubblica':
+                    testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} accertavano che il veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ivi in sosta, risultava sprovvisto della copertura assicurativa R.C.A. obbligatoria. ${sinistroText}Stante l'assenza del proprietario, si procedeva ai sensi dell'art. 193, c. 4, del D.Lgs. 285/92 alla rimozione coatta e al sequestro amministrativo del mezzo, affidato alla depositeria [NOME DEPOSITERIA]. Sul veicolo veniva lasciato apposito preavviso di accertamento.`;
+                    break;
+                case 'documenti_falsi':
+                    testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} procedevano al controllo del veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText} ${sinistroText}Invitato a esibire la documentazione, il conducente mostrava un certificato di assicurazione con evidenti anomalie riconducibili a contraffazione. La condotta integra la violazione amministrativa aggravata di cui all'art. 193, c. 4-bis, CdS, e il reato di uso di atto falso (art. 489 c.p.). Si procedeva al sequestro probatorio del documento, alla contestazione e al sequestro ai fini di confisca del veicolo. Il conducente veniva deferito in stato di libertà alla competente A.G.`;
+                    break;
+                case 'circolazione_abusiva':
+                     testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} accertavano che il veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText}, circolava abusivamente nonostante fosse già sottoposto a sequestro amministrativo con verbale n. [NUMERO VERBALE PRECEDENTE]. Tale condotta integra la violazione di cui all'art. 213, c. 8, CdS. Si procedeva a contestare la violazione e a disporre la confisca amministrativa del veicolo.`;
+                    break;
+                case 'mancata_esibizione':
+                     testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} procedevano al controllo del veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText} ${sinistroText}Invitato a esibire il certificato di assicurazione, il conducente non era in grado di ottemperare. Si procedeva a contestare la violazione dell'art. 180, commi 7 e 8, del CdS, invitando il trasgressore a presentare la documentazione presso un ufficio di polizia.`;
+                    break;
+                default:
+                    testoVerbale = "Nessun fac-simile disponibile per questo scenario.";
+            }
+
+            document.getElementById('facSimile-body').textContent = testoVerbale;
+            document.getElementById('facSimileModal').style.display = 'flex';
+        }
+
+    </script>
+</body>
+</html>
+
