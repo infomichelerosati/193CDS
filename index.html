@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulatore Guidato Art. 193 CdS (Assicurazione)</title>
-    <!-- Link al manifest per la PWA -->
-    <link rel="manifest" href="manifest.json">
-    <!-- Colore del tema per la PWA -->
-    <meta name="theme-color" content="#3b82f6">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -149,90 +145,9 @@
         details > summary::-webkit-details-marker { display: none; }
         .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
         input[type="text"], input[type="datetime-local"] { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; }
-        
-        .powered-by-box {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 9999;
-            backdrop-filter: blur(3px);
-            font-weight: 500;
-        }
-        .powered-by-text {
-            font-size: 10px;
-            animation: color-cycle 8s infinite linear, pulse 2s infinite ease-in-out;
-        }
-
-        @keyframes color-cycle {
-            0%   { color: #3b82f6; } 25%  { color: #8b5cf6; } 50%  { color: #ec4899; } 75%  { color: #f97316; } 100% { color: #3b82f6; }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
-        }
-
-        /* OTTIMIZZAZIONI PER SCHERMI PICCOLI (MOBILE) */
-        @media (max-width: 640px) {
-            body {
-                padding: 1rem 0.5rem; /* Riduco il padding generale */
-            }
-            .card {
-                padding: 1.5rem; /* Riduco il padding della card principale */
-                border-radius: 1rem;
-            }
-            .header {
-                flex-direction: column; /* Impilo logo e titolo in verticale */
-                align-items: flex-start;
-                text-align: left;
-                margin-bottom: 1.5rem;
-            }
-            .header-logo {
-                margin-right: 0;
-                margin-bottom: 1rem;
-            }
-            .header-logo svg {
-                width: 50px;
-                height: 50px;
-            }
-            .header-title h1 {
-                font-size: 1.6rem; /* Riduco la dimensione del titolo principale */
-            }
-            .header-title p {
-                font-size: 0.9rem; /* Riduco la dimensione del sottotitolo */
-            }
-            .step-title {
-                font-size: 1.25rem; /* Riduco la dimensione dei titoli dei passi */
-            }
-            .choice-button, .radio-label {
-                padding: 0.75rem 1rem; /* Riduco il padding interno dei pulsanti */
-            }
-            .choice-button strong, .radio-label strong {
-                font-size: 1rem; /* Riduco la dimensione del testo principale nei pulsanti */
-            }
-            .choice-button p, .radio-label p {
-                font-size: 0.85rem; /* Riduco la dimensione del testo secondario nei pulsanti */
-            }
-            .result-box {
-                padding: 1.5rem; /* Riduco il padding del box dei risultati */
-            }
-            .result-box h3 {
-                font-size: 1.25rem; /* Riduco la dimensione del titolo nei risultati */
-            }
-            .modal-content {
-                padding: 1.5rem;
-            }
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
-
-    <div class="powered-by-box">
-        <span class="powered-by-text">Powered By Michele Rosati</span>
-    </div>
 
     <div class="card mx-auto">
         <div class="header">
@@ -281,14 +196,14 @@
                 <div class="space-y-6">
                     <div>
                         <label class="font-semibold text-gray-800">Tipo Veicolo</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                        <div class="grid grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="tipoVeicoloAuto" name="tipoVeicolo" value="autoveicolo" checked><label for="tipoVeicoloAuto" class="radio-label"><strong>Autoveicolo</strong></p></label></div>
                             <div><input type="radio" id="tipoVeicoloMoto" name="tipoVeicolo" value="motociclo"><label for="tipoVeicoloMoto" class="radio-label"><strong>Motociclo/Ciclomotore</strong></p></label></div>
                         </div>
                     </div>
                     <div>
                         <label class="font-semibold text-gray-800">Conducente / Veicolo</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                        <div class="grid grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="nazionalitaIT" name="nazionalita" value="italiano" checked><label for="nazionalitaIT" class="radio-label"><strong>Italiano/Comunitario</strong><p>Patente e veicolo italiani/UE</p></label></div>
                             <div><input type="radio" id="nazionalitaExtra" name="nazionalita" value="straniero"><label for="nazionalitaExtra" class="radio-label"><strong>Straniero Extra-UE</strong><p>Patente o veicolo non UE</p></label></div>
                         </div>
@@ -296,14 +211,14 @@
                     </div>
                     <div>
                         <label class="font-semibold text-gray-800">Ha causato un sinistro stradale?<span class="info-icon" onclick="showInfoModal('sinistro')">i</span></label>
-                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                         <div class="grid grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="sinistroNo" name="sinistro" value="no" checked><label for="sinistroNo" class="radio-label"><strong>No</strong></label></div>
                             <div><input type="radio" id="sinistroSi" name="sinistro" value="si"><label for="sinistroSi" class="radio-label"><strong>Sì</strong></label></div>
                         </div>
                     </div>
                     <div id="sinistro-details" class="hidden pl-4 mt-4 border-l-4 border-red-400">
                         <label class="font-semibold text-red-800">Conseguenze del Sinistro</label>
-                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                         <div class="grid grid-cols-2 gap-4 mt-2">
                             <div><input type="radio" id="sinistroDanni" name="tipoSinistro" value="danni"><label for="sinistroDanni" class="radio-label"><strong>Solo danni a cose</strong></label></div>
                             <div><input type="radio" id="sinistroLesioni" name="tipoSinistro" value="lesioni"><label for="sinistroLesioni" class="radio-label"><strong>Lesioni a persone</strong></label></div>
                         </div>
@@ -378,19 +293,6 @@
     <div id="facSimileModal" class="modal"><div class="modal-content"><span class="close-button" onclick="this.parentElement.parentElement.style.display = 'none'">&times;</span><h4 class="text-xl font-bold mb-4">Fac-Simile: Testo per Verbale</h4><div id="facSimile-body" class="modal-body"></div></div></div>
 
     <script>
-        // Registrazione del Service Worker per la PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-            });
-        }
-
         const accertamentoState = {};
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -419,6 +321,7 @@
             proprietaTerzi: {title: 'Informazione: Principio di Estraneità del Proprietario', text: 'Se il veicolo appartiene a una persona estranea alla violazione, non si applica la confisca amministrativa nei casi in cui sarebbe prevista. Il veicolo viene comunque sequestrato e affidato in custodia giudiziale al proprietario.'},
             documentiFalsi: {title: 'Informazione: Art. 193, c. 4-bis - Documenti Falsi', text: 'La presentazione di documenti assicurativi falsi o contraffatti comporta il raddoppio della sanzione pecuniaria, la sospensione della patente per un anno e la confisca amministrativa del veicolo. Si configura anche il reato di uso di atto falso (Art. 489 c.p.).'},
             sequestro: {title: 'Informazione: Art. 193, c. 4 - Sequestro Amministrativo', text: 'L\'organo accertatore dispone il sequestro del veicolo. La procedura prevede: 1) Ordinare la cessazione della circolazione. 2) Offrire al proprietario/conducente la custodia in un\'area privata non soggetta a pubblico passaggio. 3) Se non possibile, affidare il veicolo a una depositeria autorizzata, con rimozione tramite carroattrezzi. 4) Apporre sempre i sigilli di sequestro.'},
+            diffidaRitiro: {title: 'Informazione: Diffida al Ritiro (Art. 213, c. 2-quater)', text: 'Quando il veicolo è affidato a una depositeria, la notifica del verbale di sequestro al proprietario costituisce diffida a prendere in custodia il veicolo entro 10 giorni. Se il proprietario non assume la custodia entro tale termine (previo pagamento delle spese), il veicolo è considerato abbandonato e viene trasferito in proprietà alla depositeria per la demolizione.'},
             circolazioneAbusiva: {title: 'Informazione: Art. 213, c. 8 - Circolazione Abusiva', text: 'Chiunque circola con un veicolo sequestrato è punito con una sanzione da 2.046 a 8.186 euro, sospensione della patente da uno a tre mesi e confisca obbligatoria del veicolo.'},
             art180: {title: 'Informazione: Art. 180, c. 8 - Mancata Esibizione', text: 'Se il conducente non può esibire il certificato ma dichiara di averlo, e non è possibile una verifica immediata, si contesta l\'Art. 180, c. 7 (sanzione da 42 a 173 euro) e si redige un verbale con l\'invito a presentare i documenti. Il veicolo può proseguire la marcia.'},
             norma_193_2: {title: 'Riferimento Normativo: Art. 193, comma 2, CdS', text: '«Chiunque circola senza la copertura dell\'assicurazione è soggetto alla sanzione amministrativa del pagamento di una somma da euro 866 a euro 3.464.»'},
@@ -565,6 +468,8 @@
                          gestioneVeicolo.procedura = `1. Essendo il proprietario assente, procedere con la rimozione forzata del veicolo.\n2. Affidare il veicolo a depositeria autorizzata.\n3. Redigere verbale di sequestro e apporre i sigilli.`;
                          atti = ['Preavviso di accertamento', 'Verbale di sequestro e affidamento a depositeria', 'Apposizione sigilli'];
                          adempimenti = ['Identificare il proprietario e notificare il verbale di contestazione.', 'Trasmettere copia verbali alla Prefettura U.T.G.'];
+                         // Add diffida
+                         atti.push('Notifica con diffida al ritiro (ex art. 213 c. 2-quater)');
                     }
                     break;
                 case 'documenti_falsi':
@@ -573,7 +478,7 @@
                     multaMin *= 2; multaMax *= 2;
                     sospensionePatenteMin = 12; sospensionePatenteMax = 12;
                     gestioneVeicolo = { misura: 'Sequestro ai fini della Confisca Amministrativa', procedura: 'Affidamento obbligatorio a depositeria autorizzata con carroattrezzi.', infoKey: 'documentiFalsi', normaKey: 'norma_193_4bis_falsi'};
-                    atti = ['Verbale di contestazione (violazione aggravata)', 'Verbale di sequestro ai fini di confisca', 'Notizia di Reato per uso di atto falso'];
+                    atti = ['Verbale di contestazione (violazione aggravata)', 'Verbale di sequestro ai fini di confisca', 'Notizia di Reato per uso di atto falso', 'Notifica con diffida al ritiro (ex art. 213 c. 2-quater)'];
                     adempimenti.push('Trasmissione Notizia di Reato alla Procura della Repubblica.');
                     sanzioneNormaKey = 'norma_193_4bis_falsi';
                     break;
@@ -583,7 +488,7 @@
                     multaMin = 2046; multaMax = 8186;
                     sospensionePatenteMin = 1; sospensionePatenteMax = 3;
                     gestioneVeicolo = { misura: 'Confisca obbligatoria del veicolo', procedura: 'Rimozione con carroattrezzi e affidamento a depositeria per la successiva confisca.', infoKey: 'circolazioneAbusiva', normaKey: 'norma_213_8_abusiva' };
-                    atti = ['Verbale di contestazione Art. 213 c.8', 'Verbale di affidamento a depositeria per confisca'];
+                    atti = ['Verbale di contestazione Art. 213 c.8', 'Verbale di affidamento a depositeria per confisca', 'Notifica con diffida al ritiro (ex art. 213 c. 2-quater)'];
                     adempimenti.push('In caso di recidiva, segnalare alla Prefettura per la revoca della patente.');
                     sanzioneNormaKey = 'norma_213_8_abusiva';
                     break;
@@ -662,8 +567,17 @@
                  if (accertamentoState.caso === 'documenti_falsi') sospensioneNormaKey = 'norma_193_4bis_falsi';
                  sanctionsList.innerHTML += `<li class="flex items-start gap-4">${icons.card}<div><strong>Sanzione Accessoria: <span class="info-icon norma-icon" onclick="showInfoModal('${sospensioneNormaKey}')">N</span></strong><p>${sanzioneAccessoriaTesto} ${text}</p></div></li>`;
             }
+            // Add diffida info icon if applicable
+             if (data.atti.includes('Notifica con diffida al ritiro (ex art. 213 c. 2-quater)')) {
+                 const actsList = document.getElementById('actsList');
+                 const li = document.createElement('li');
+                 li.innerHTML = `Notifica con diffida al ritiro (ex art. 213 c. 2-quater) <span class="info-icon" onclick="showInfoModal('diffidaRitiro')">i</span>`;
+                 actsList.appendChild(li);
+                 data.atti = data.atti.filter(item => item !== 'Notifica con diffida al ritiro (ex art. 213 c. 2-quater)');
+            }
 
-            document.getElementById('actsList').innerHTML = [...new Set(data.atti)].map(act => `<li>${act}</li>`).join('');
+
+            document.getElementById('actsList').innerHTML += [...new Set(data.atti)].map(act => `<li>${act}</li>`).join('');
             document.getElementById('adempimentiList').innerHTML = data.adempimenti.map(ad => `<li>${ad}</li>`).join('');
         }
         
@@ -699,7 +613,7 @@
                     testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} procedevano al controllo del veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText} ${sinistroText}All'esito degli accertamenti, si verificava che il veicolo circolava sprovvisto della copertura assicurativa R.C.A., in violazione dell'art. 193, c. 2, del D.Lgs. 285/92. Si procedeva alla contestazione e al sequestro amministrativo del veicolo, affidato in custodia a [CUSTODE].`;
                     break;
                 case 'sosta_pubblica':
-                    testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} accertavano che il veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ivi in sosta, risultava sprovvisto della copertura assicurativa R.C.A. obbligatoria. ${sinistroText}Stante l'assenza del proprietario, si procedeva ai sensi dell'art. 193, c. 4, del D.Lgs. 285/92 alla rimozione coatta e al sequestro amministrativo del mezzo, affidato alla depositeria [NOME DEPOSITERIA]. Sul veicolo veniva lasciato apposito preavviso di accertamento.`;
+                    testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} accertavano che il veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ivi in sosta, risultava sprovvisto della copertura assicurativa R.C.A. obbligatoria. ${sinistroText}Stante l'assenza del proprietario, si procedeva ai sensi dell'art. 193, c. 4, del D.Lgs. 285/92 alla rimozione coatta e al sequestro amministrativo del mezzo, affidato alla depositeria [NOME DEPOSITERIA]. Si dà atto che la notifica del presente verbale al proprietario costituisce formale diffida a prendere in custodia il veicolo entro 10 giorni, ai sensi dell'art. 213 CdS.`;
                     break;
                 case 'documenti_falsi':
                     testoVerbale = `In data ${dataOra}, in ${luogo}, i sottoscritti ${agenti} procedevano al controllo del veicolo tipo ${accertamentoState.tipoVeicolo} targato ${targa}, ${conducenteText} ${sinistroText}Invitato a esibire la documentazione, il conducente mostrava un certificato di assicurazione con evidenti anomalie riconducibili a contraffazione. La condotta integra la violazione amministrativa aggravata di cui all'art. 193, c. 4-bis, CdS, e il reato di uso di atto falso (art. 489 c.p.). Si procedeva al sequestro probatorio del documento, alla contestazione e al sequestro ai fini di confisca del veicolo. Il conducente veniva deferito in stato di libertà alla competente A.G.`;
@@ -721,3 +635,4 @@
     </script>
 </body>
 </html>
+
