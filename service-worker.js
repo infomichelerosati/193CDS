@@ -1,42 +1,51 @@
-// Definisce un nome e una versione per la cache
-const CACHE_NAME = 'simulatore-193-cache-v2';
+// Service Worker Prontuario Operativo Art. 193 CdS - Edizione 2026
+const CACHE_NAME = 'simulatore-193-cache-v2026.1';
 
-// Elenco dei file da memorizzare nella cache per il funzionamento offline
-// In questo caso, la pagina principale e le risorse esterne
 const urlsToCache = [
-  './', // La pagina index.html
+  './',
+  './index.html',
+  './manifest.json',
   'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
 ];
 
-// Evento 'install': si verifica quando il service worker viene installato
 self.addEventListener('install', event => {
-  // Attende che l'installazione sia completata
   event.waitUntil(
-    // Apre la cache con il nome definito
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Cache aperta');
-        // Aggiunge tutte le risorse specificate alla cache
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Cache 2026 aperta con successo');
+      return cache.addAll(urlsToCache);
+    }).then(() => self.skipWaiting())
   );
 });
 
-// Evento 'fetch': si verifica ogni volta che l'app richiede una risorsa (es. pagina, script, css)
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Rimozione vecchia cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
-    // Cerca la risorsa richiesta nella cache
-    caches.match(event.request)
-      .then(response => {
-        // Se la risorsa è trovata nella cache, la restituisce
-        if (response) {
-          return response;
-        }
-        // Altrimenti, richiede la risorsa dalla rete
-        return fetch(event.request);
+    caches.match(event.request).then(response => {
+      if (response) {
+        return response;
       }
-    )
+      return fetch(event.request).then(networkResponse => {
+        return networkResponse;
+      }).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
+    })
   );
 });
-
