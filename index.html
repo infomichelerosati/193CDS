@@ -973,19 +973,21 @@
             let proceduraPatente = 'Patente restituita al conducente.';
             let attiList = [];
 
-            // GESTIONE MONOPATTINI (Micromobilità Elettrica - Riforma CdS)
+            // GESTIONE MONOPATTINI (Micromobilità Elettrica - Legge 160/2019 e Riforma CdS)
             if (state.tipoVeicolo === 'monopattino') {
                 titolo = 'Monopattino Elettrico Privo di Assicurazione Obbligatoria';
-                badgeArticolo = 'L. 177/2024 - Riforma CdS Micromobilità';
-                sottotitolo = 'Circolazione con monopattino a propulsione prevalentemente elettrica sprovvisto di copertura assicurativa R.C.';
+                badgeCategoria = 'MICROMOBILITÀ ELETTRICA';
+                badgeArticolo = 'Art. 1, commi 75-ter e 75-undevicies, L. 160/2019';
+                sottotitolo = 'Circolazione con monopattino a propulsione prevalentemente elettrica sprovvisto della copertura assicurativa R.C. obbligatoria verso terzi.';
                 minEdittale = 100.00;
                 maxEdittale = 400.00;
                 sconto30 = 70.00;
-                misuraVeicolo = 'Sequestro amministrativo del monopattino ai sensi dell\'art. 213 CdS ai fini della confisca';
-                proceduraVeicolo = 'Ritiro immediato del mezzo, custodia e trasmissione atti alla Prefettura per la confisca amministrativa.';
-                attiList.push('Verbale di accertamento e contestazione violazione micromobilità');
-                attiList.push('Verbale di sequestro amministrativo del monopattino');
-                attiList.push('Verbale di affidamento in custodia (a custode autorizzato o al trasgressore)');
+                misuraVeicolo = '<span class="text-amber-700">NESSUN SEQUESTRO AMMINISTRATIVO né Confisca (Cessazione immediata marcia)</span>';
+                proceduraVeicolo = 'Per la SOLA mancanza di assicurazione (a differenza dei veicoli a motore tradizionali) la norma speciale (L. 160/2019) non prevede il sequestro amministrativo ex art. 213 CdS. Il conducente deve interrompere immediatamente la circolazione (il mezzo può essere allontanato solo condotto a mano o caricato su altro veicolo). NOTA: Il sequestro ai fini di confisca si applica SOLO se il mezzo è alterato o ha potenza continua > 1 kW (comma 75-vicies).';
+                misuraPatente = 'Nessuna misura sulla patente di guida.';
+                proceduraPatente = 'Nessun provvedimento sulla patente.';
+                attiList.push('Verbale di accertamento e contestazione violazione Art. 1, commi 75-ter e 75-undevicies, Legge 160/2019');
+                attiList.push('Intimazione verbale alla cessazione immediata della marcia condotta a bordo (conduzione consentita solo a mano)');
             }
             // GESTIONE DOCUMENTI FALSI O CONTRAFFATTI (Art. 193 c. 4-bis)
             else if (state.statoCopertura === 'documenti_falsi') {
@@ -1101,21 +1103,23 @@
                 attiList.push('Verbale di sequestro amministrativo e apposizione sigilli');
             }
 
-            // GESTIONE CUSTODIA ART. 213 (Rifiuto o Depositeria)
-            if (state.custodiaVeicolo === 'rifiuto_custodia') {
-                misuraVeicolo += ' <span class="text-red-600 block mt-1">⚠️ RICUSAZIONE CUSTODIA (Art. 213 c. 5): Rimozione forzata coatta a depositeria convenzionata.</span>';
-                misuraPatente += ' <span class="text-red-600 block mt-1">⚠️ Ritiro immediato patente per SOSPENSIONE DA 1 A 3 MESI ex Art. 213 c. 5!</span>';
-                attiList.push('Verbale autonomo di contestazione Art. 213 c. 5 CdS (Rifiuto custodia: sanzione € 1.818 - € 7.276)');
-                attiList.push('Verbale di ritiro patente di guida per rifiuto custodia');
-                attiList.push('Verbale di rimozione coatta e affidamento a custode-acquirente autorizzato');
-                attiList.push('Diffida al proprietario a ritirare il veicolo entro 10 giorni');
-            } else if (state.custodiaVeicolo === 'depositeria_assenza') {
-                misuraVeicolo += ' <span class="text-blue-700 block mt-1">Rimozione forzata e deposito presso custode convenzionato per assenza proprietario/mancanza luogo idoneo.</span>';
-                attiList.push('Verbale di rimozione e affidamento a depositeria autorizzata');
-                attiList.push('Notifica verbale con diffida ad assumere la custodia entro 10 giorni');
-            } else {
-                misuraVeicolo += ' <span class="text-emerald-700 block mt-1">Affidato in custodia al conducente/proprietario con ricovero in luogo privato non soggetto a pubblico passaggio.</span>';
-                attiList.push('Verbale di affidamento in custodia al trasgressore con nomina e avviso obblighi di legge');
+            // GESTIONE CUSTODIA ART. 213 (Rifiuto o Depositeria) - Solo per veicoli soggetti a sequestro
+            if (state.tipoVeicolo !== 'monopattino') {
+                if (state.custodiaVeicolo === 'rifiuto_custodia') {
+                    misuraVeicolo += ' <span class="text-red-600 block mt-1">⚠️ RICUSAZIONE CUSTODIA (Art. 213 c. 5): Rimozione forzata coatta a depositeria convenzionata.</span>';
+                    misuraPatente += ' <span class="text-red-600 block mt-1">⚠️ Ritiro immediato patente per SOSPENSIONE DA 1 A 3 MESI ex Art. 213 c. 5!</span>';
+                    attiList.push('Verbale autonomo di contestazione Art. 213 c. 5 CdS (Rifiuto custodia: sanzione € 1.818 - € 7.276)');
+                    attiList.push('Verbale di ritiro patente di guida per rifiuto custodia');
+                    attiList.push('Verbale di rimozione coatta e affidamento a custode-acquirente autorizzato');
+                    attiList.push('Diffida al proprietario a ritirare il veicolo entro 10 giorni');
+                } else if (state.custodiaVeicolo === 'depositeria_assenza') {
+                    misuraVeicolo += ' <span class="text-blue-700 block mt-1">Rimozione forzata e deposito presso custode convenzionato per assenza proprietario/mancanza luogo idoneo.</span>';
+                    attiList.push('Verbale di rimozione e affidamento a depositeria autorizzata');
+                    attiList.push('Notifica verbale con diffida ad assumere la custodia entro 10 giorni');
+                } else {
+                    misuraVeicolo += ' <span class="text-emerald-700 block mt-1">Affidato in custodia al conducente/proprietario con ricovero in luogo privato non soggetto a pubblico passaggio.</span>';
+                    attiList.push('Verbale di affidamento in custodia al trasgressore con nomina e avviso obblighi di legge');
+                }
             }
 
             // Conducente minorenne
@@ -1227,10 +1231,10 @@
                 testo += `SANZIONE PECUNIARIA RIDOTTA A UN QUARTO: Euro 216,50 (ridotta del 30% entro 5 gg: Euro 151,55).\n`;
                 testo += `SANZIONE ACCESSORIA: Sequestro amministrativo del veicolo ex art. 213 CdS.\n`;
             } else if (state.tipoVeicolo === 'monopattino') {
-                testo += `Il conducente circolava alla guida di monopattino a propulsione prevalentemente elettrica sprovvisto della copertura assicurativa per la responsabilità civile verso terzi resa obbligatoria dalla Riforma del Codice della Strada (Legge 177/2024).\n`;
-                testo += `NORMA VIOLATA: Disposizioni sulla micromobilità elettrica e Art. 193 CdS.\n`;
-                testo += `SANZIONE PECUNIARIA: Euro 100,00 (ridotta del 30% entro 5 gg: Euro 70,00).\n`;
-                testo += `SANZIONE ACCESSORIA: Sequestro amministrativo del monopattino ai sensi dell'art. 213 CdS.\n`;
+                testo += `Il conducente circolava alla guida di monopattino a propulsione prevalentemente elettrica sprovvisto della prescritta copertura assicurativa per la responsabilità civile verso terzi.\n`;
+                testo += `NORMA VIOLATA: Art. 1, commi 75-ter e 75-undevicies della Legge 27 dicembre 2019, n. 160 (modificata dalla Legge 177/2024).\n`;
+                testo += `SANZIONE PECUNIARIA: Euro 100,00 (pagamento entro 5 gg con riduzione 30%: Euro 70,00; max edittale Euro 400,00).\n`;
+                testo += `MISURA SUL VEICOLO: Nessuna sanzione accessoria del sequestro o della confisca (non prevista dalla norma speciale per la sola assenza di polizza RCA). Si diffida e si ordina al conducente di far cessare immediatamente la circolazione, consentendo esclusivamente l'allontanamento a mano del mezzo spento o il trasporto su altro veicolo idoneo.\n`;
             } else {
                 testo += `Dall'interrogazione dell'archivio nazionale dei veicoli (MCTC) e del database ANIA, il veicolo risultava sprovvisto della copertura assicurativa obbligatoria per la responsabilità civile verso terzi.\n`;
                 testo += `NORMA VIOLATA: Art. 193, comma 2 del CdS.\n`;
@@ -1244,20 +1248,25 @@
                 testo += `SANZIONE ACCESSORIA: Sequestro amministrativo del veicolo ai sensi dell'art. 213 CdS.\n`;
             }
 
-            testo += `\nGESTIONE DELLA CUSTODIA (ART. 213 CdS):\n`;
-            if (state.custodiaVeicolo === 'rifiuto_custodia') {
-                testo += `RICUSAZIONE CUSTODIA: Invitato ad assumere la custodia del veicolo in luogo idoneo, il soggetto RIFIUTAVA espressamente di assumere la custodia giudiziale. Si contesta contestualmente la gravissima violazione dell'Art. 213, comma 5 CdS (sanzione da Euro 1.818 a 7.276 e sospensione patente da 1 a 3 mesi). Il veicolo viene rimosso a mezzo soccorso stradale e affidato alla depositeria autorizzata [NOME DEPOSITERIA].\n`;
-            } else if (state.custodiaVeicolo === 'depositeria_assenza') {
-                testo += `Stante l'assenza del proprietario/conducente o la mancata disponibilità di luogo non soggetto a pubblico passaggio, il veicolo viene prelevato e depositato presso la depositeria autorizzata [NOME DEPOSITERIA]. Si dà formale avviso che decorsi 10 giorni dalla notifica del verbale senza che il proprietario provveda ad assumere la custodia, il veicolo sarà alienato ai sensi dell'art. 213 c. 2-quater CdS.\n`;
-            } else {
-                testo += `Il veicolo viene affidato in custodia a: [NOME CUSTODE], con obbligo di ricovero in luogo non soggetto a pubblico passaggio sito in: [INDIRIZZO RICOVERO], previa apposizione dei sigilli di sequestro. Il custode viene reso edotto dei doveri di custodia e delle pene stabilite dagli artt. 334 e 335 del Codice Penale per sottrazione o danneggiamento di cose sottoposte a sequestro.\n`;
-            }
+            if (state.tipoVeicolo !== 'monopattino') {
+                testo += `\nGESTIONE DELLA CUSTODIA (ART. 213 CdS):\n`;
+                if (state.custodiaVeicolo === 'rifiuto_custodia') {
+                    testo += `RICUSAZIONE CUSTODIA: Invitato ad assumere la custodia del veicolo in luogo idoneo, il soggetto RIFIUTAVA espressamente di assumere la custodia giudiziale. Si contesta contestualmente la gravissima violazione dell'Art. 213, comma 5 CdS (sanzione da Euro 1.818 a 7.276 e sospensione patente da 1 a 3 mesi). Il veicolo viene rimosso a mezzo soccorso stradale e affidato alla depositeria autorizzata [NOME DEPOSITERIA].\n`;
+                } else if (state.custodiaVeicolo === 'depositeria_assenza') {
+                    testo += `Stante l'assenza del proprietario/conducente o la mancata disponibilità di luogo non soggetto a pubblico passaggio, il veicolo viene prelevato e depositato presso la depositeria autorizzata [NOME DEPOSITERIA]. Si dà formale avviso che decorsi 10 giorni dalla notifica del verbale senza che il proprietario provveda ad assumere la custodia, il veicolo sarà alienato ai sensi dell'art. 213 c. 2-quater CdS.\n`;
+                } else {
+                    testo += `Il veicolo viene affidato in custodia a: [NOME CUSTODE], con obbligo di ricovero in luogo non soggetto a pubblico passaggio sito in: [INDIRIZZO RICOVERO], previa apposizione dei sigilli di sequestro. Il custode viene reso edotto dei doveri di custodia e delle pene stabilite dagli artt. 334 e 335 del Codice Penale per sottrazione o danneggiamento di cose sottoposte a sequestro.\n`;
+                }
 
-            testo += `\nCONDIZIONI PER LA RESTITUZIONE (DISSEQUESTRO):\n`;
-            testo += `Il veicolo potrà essere restituito all'avente diritto previo:\n`;
-            testo += `1) Pagamento della sanzione in misura ridotta o versamento di cauzione;\n`;
-            testo += `2) Pagamento integrale delle spese di prelievo, trasporto e custodia;\n`;
-            testo += `3) Dimostrazione della stipula di polizza assicurativa R.C.A. per un periodo di ALMENO SEI MESI.\n\n`;
+                testo += `\nCONDIZIONI PER LA RESTITUZIONE (DISSEQUESTRO):\n`;
+                testo += `Il veicolo potrà essere restituito all'avente diritto previo:\n`;
+                testo += `1) Pagamento della sanzione in misura ridotta o versamento di cauzione;\n`;
+                testo += `2) Pagamento integrale delle spese di prelievo, trasporto e custodia;\n`;
+                testo += `3) Dimostrazione della stipula di polizza assicurativa R.C.A. per un periodo di ALMENO SEI MESI.\n\n`;
+            } else {
+                testo += `\nMISURE OPERATIVE IMMEDIATA:\n`;
+                testo += `Si diffida il conducente dalla ripresa della marcia a bordo del monopattino fino a regolarizzazione della posizione assicurativa.\n\n`;
+            }
 
             testo += `Fatto, letto, confermato e sottoscritto dai verbalizzanti e dal trasgressore/custode.\n`;
             testo += `Firma del Trasgressore/Custode: _______________________\n`;
