@@ -494,7 +494,7 @@
                     </label>
 
                     <!-- GESTIONE CUSTODIA ART. 213 -->
-                    <div class="p-4 bg-blue-50/60 rounded-xl border border-blue-200">
+                    <div id="boxCustodiaVeicolo" class="p-4 bg-blue-50/60 rounded-xl border border-blue-200">
                         <h4 class="font-bold text-blue-950 text-sm mb-2 flex items-center gap-2">
                             <span>🏛️ Procedura di Custodia del Veicolo Sequestrato (Art. 213 CdS)</span>
                         </h4>
@@ -813,6 +813,13 @@
             hideAllSteps();
             const stepElement = document.getElementById('step-' + stepNumber);
             if (stepElement) {
+                // Se entriamo nello step 4 e il veicolo è un monopattino, nascondiamo la sezione custodia/sequestro
+                if (stepNumber === 4) {
+                    const boxCustodia = document.getElementById('boxCustodiaVeicolo');
+                    if (boxCustodia) {
+                        boxCustodia.classList.toggle('hidden', state.tipoVeicolo === 'monopattino');
+                    }
+                }
                 stepElement.classList.remove('hidden');
                 updateProgressBar(stepNumber);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1098,13 +1105,22 @@
                 }
 
                 // Misure di sequestro standard
-                proceduraVeicolo = 'Ordinare la cessazione della circolazione, apporre i sigilli e redigere verbale di sequestro e custodia. Dissequestro condizionato a: 1) Pagamento sanzione/spese; 2) Riattivazione polizza per almeno 6 mesi.';
-                attiList.push('Verbale di contestazione Art. 193 c. 2 CdS');
-                attiList.push('Verbale di sequestro amministrativo e apposizione sigilli');
+                // Se l'accertamento è da remoto, specificare la procedura di notifica e assenza sequestro immediato
+                if (state.contesto === 'rilevamento_remoto') {
+                    misuraVeicolo = 'Nessun sequestro immediato (Atto notificato ex art. 201 CdS)';
+                    proceduraVeicolo = 'Trattandosi di rilevamento da dispositivo con contestazione differita, non si esegue il sequestro su strada. Il verbale viene notificato al proprietario entro 90 giorni. L\'obbligato dovrà presentare ricevuta di pagamento e polizza valida per almeno 6 mesi per evitare successivi provvedimenti di sequestro.';
+                    attiList = attiList.filter(a => !a.includes('sequestro') && !a.includes('custodia') && !a.includes('sigilli'));
+                    attiList.unshift('Verbale di contestazione con notifica differita ex art. 201 CdS entro 90 giorni');
+                    attiList.push('Invito ad esibire polizza valida per almeno 6 mesi e ricevuta pagamento');
+                } else {
+                    proceduraVeicolo = 'Ordinare la cessazione della circolazione, apporre i sigilli e redigere verbale di sequestro e custodia. Dissequestro condizionato a: 1) Pagamento sanzione/spese; 2) Riattivazione polizza per almeno 6 mesi.';
+                    attiList.push('Verbale di contestazione Art. 193 c. 2 CdS');
+                    attiList.push('Verbale di sequestro amministrativo e apposizione sigilli');
+                }
             }
 
-            // GESTIONE CUSTODIA ART. 213 (Rifiuto o Depositeria) - Solo per veicoli soggetti a sequestro
-            if (state.tipoVeicolo !== 'monopattino') {
+            // GESTIONE CUSTODIA ART. 213 (Rifiuto o Depositeria) - Solo per veicoli soggetti a sequestro immediato
+            if (state.tipoVeicolo !== 'monopattino' && state.contesto !== 'rilevamento_remoto') {
                 if (state.custodiaVeicolo === 'rifiuto_custodia') {
                     misuraVeicolo += ' <span class="text-red-600 block mt-1">⚠️ RICUSAZIONE CUSTODIA (Art. 213 c. 5): Rimozione forzata coatta a depositeria convenzionata.</span>';
                     misuraPatente += ' <span class="text-red-600 block mt-1">⚠️ Ritiro immediato patente per SOSPENSIONE DA 1 A 3 MESI ex Art. 213 c. 5!</span>';
@@ -1202,6 +1218,8 @@
                 testo += `CIRCOSTANZE: Il veicolo sopra descritto veniva trovato in sosta su pubblica via/area aperta al pubblico transito in assenza del conducente/proprietario.\n`;
             } else if (state.contesto === 'area_privata') {
                 testo += `CIRCOSTANZE: Il veicolo sopra descritto veniva accertato su area privata non aperta al pubblico transito, privo di idonea copertura assicurativa R.C.A., non ricorrendo alcuna delle deroghe tassative di cui all'art. 122-bis del D.Lgs. 209/2005 (modificato dal D.Lgs. 184/2023).\n`;
+            } else if (state.contesto === 'rilevamento_remoto') {
+                testo += `CIRCOSTANZE: Il transito del veicolo veniva rilevato a mezzo dispositivo di lettura targhe/documentale [MODELLO/MATRICOLA DISPOSITIVO]. Motivo della mancata contestazione immediata: impossibilità di fermare il veicolo in tempo utile nei modi regolamentari senza recare pregiudizio alla sicurezza della circolazione (Art. 201, c. 1-bis CdS). Si procede a notifica differita all'obbligato in solido entro 90 giorni previa verifica incrociata su archivio ANIA/MCTC.\n`;
             } else {
                 testo += `CIRCOSTANZE: Il veicolo veniva fermato durante la circolazione su strada pubblica, condotto da: ${conducente}.\n`;
             }
@@ -1248,7 +1266,7 @@
                 testo += `SANZIONE ACCESSORIA: Sequestro amministrativo del veicolo ai sensi dell'art. 213 CdS.\n`;
             }
 
-            if (state.tipoVeicolo !== 'monopattino') {
+            if (state.tipoVeicolo !== 'monopattino' && state.contesto !== 'rilevamento_remoto') {
                 testo += `\nGESTIONE DELLA CUSTODIA (ART. 213 CdS):\n`;
                 if (state.custodiaVeicolo === 'rifiuto_custodia') {
                     testo += `RICUSAZIONE CUSTODIA: Invitato ad assumere la custodia del veicolo in luogo idoneo, il soggetto RIFIUTAVA espressamente di assumere la custodia giudiziale. Si contesta contestualmente la gravissima violazione dell'Art. 213, comma 5 CdS (sanzione da Euro 1.818 a 7.276 e sospensione patente da 1 a 3 mesi). Il veicolo viene rimosso a mezzo soccorso stradale e affidato alla depositeria autorizzata [NOME DEPOSITERIA].\n`;
